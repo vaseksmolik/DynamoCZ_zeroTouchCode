@@ -35,71 +35,74 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CoreNodeModels">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\nodes\CoreNodeModels.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\nodes\CoreNodeModels.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DesignScriptBuiltin">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DesignScriptBuiltin.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DesignScriptBuiltin.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DSCoreNodes">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DSCoreNodes.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DSCoreNodes.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoApplications">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoApplications.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoApplications.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoCore">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoCore.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoInstallDetective">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoInstallDetective.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoInstallDetective.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoPackages">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoServices">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoServices.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoServices.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoShapeManager">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoShapeManager.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoShapeManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="DynamoUnits">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoUnits.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\DynamoUnits.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>C:\Program Files (x86)\Revit Test Framework\2019\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="ProtoCore">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\ProtoCore.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\ProtoCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ProtoGeometry">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\ProtoGeometry.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\ProtoGeometry.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitNodes">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\Revit\RevitNodes.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\Revit\RevitNodes.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitServices">
-      <HintPath>..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\Revit\RevitServices.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\AddIns\DynamoForRevit\Revit\RevitServices.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System">
