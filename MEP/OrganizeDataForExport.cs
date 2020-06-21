@@ -82,6 +82,8 @@ namespace DynamoCZ
                         {
                             row.Add(typeParameter.AsWhatever());
                         }
+                        else
+                            row.Add("");
                     }
                 }
                 rows.Add(row);
