@@ -16,10 +16,10 @@ namespace DynamoCZ
     {
 
         /// <summary>
-        /// 获取当前模型指定视图内的所有最外层的墙体
+        /// 
         /// </summary>
         /// <param name="doc"></param>
-        /// <param name="view">视图,默认是当前激活的视图</param>
+        /// <param name="view">视图,</param>
         /// <returns></returns>
         public static List<ElementId> MetodaOhranicujiciMistnosti(Document doc)
         {
@@ -134,7 +134,7 @@ namespace DynamoCZ
         }
 
         /// <summary>
-        /// 过滤出需要的墙体
+        /// 
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="room"></param>

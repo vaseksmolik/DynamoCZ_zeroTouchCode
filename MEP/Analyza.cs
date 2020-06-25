@@ -13,7 +13,6 @@ using System;
 using RevitServices.Transactions;
 using System.Linq;
 using ProtoCore.AST.AssociativeAST;
-using Newtonsoft.Json;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.Attributes;
 using System.Windows;
@@ -56,48 +55,6 @@ namespace DynamoCZ
             return _return.Select(s => ElementWrapper.ToDSType(doc.GetElement(s), true)).ToList();
         }
 
-        [Transaction(TransactionMode.Manual)]
-        [IsVisibleInDynamoLibrary(false)]
-        public class DetekujObvodoveStenyCommand : IExternalCommand
-        {
-            public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-            {
-                UIApplication uiapp = commandData.Application;
-                UIDocument uidoc = uiapp.ActiveUIDocument;
-                Document doc = uidoc.Document;
-
-                List<ElementId> _return = new List<ElementId>();
-
-                //Utils.Transactions.TryRollbackTransaction(doc, new Action(() =>
-                //{
-                //TransactionManager.Instance.EnsureInTransaction(doc);
-                using (TransactionGroup trGr = new TransactionGroup(doc, "rollbackTrans"))
-                {
-                    trGr.Start();
-                    List<Level> levels = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().ToList();
-
-                    _return.AddRange(DynamoCZ.GetOutermostWalls.MetodaOhranicujiciMistnosti(doc));
-
-                    _return = _return.Distinct().ToList();
-                    trGr.RollBack();
-                }
-
-
-
-                //TransactionManager.Instance.TransactionTaskDone();
-                //}));
-
-                //if (_return.Count() == 0)
-                //    throw new Exception("Nebyly nalezeny žádné konstrukce !");
-                System.Windows.Forms.MessageBox.Show(string.Join("\n", _return));
-                uidoc.Selection.SetElementIds(_return);
-                //System.Windows.Forms.MessageBox.Show(_return.Select(s => ElementWrapper.ToDSType(doc.GetElement(s), true)).ToList().ToString());
-
-                return Result.Succeeded;
-            }
-
-        }
-
         /// <summary>
         /// Najde všechny Výplně otvorů hostované na zadaných konstrukcích.
         /// </summary>
@@ -137,37 +94,7 @@ namespace DynamoCZ
             return celkovyObjem;
         }
 
-        [Transaction(TransactionMode.Manual)]
-        [IsVisibleInDynamoLibrary(false)]
-        public class SectiObjemProstoruCommand : IExternalCommand
-        {
-            public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
-            {
-                UIApplication uiapp = commandData.Application;
-                UIDocument uidoc = uiapp.ActiveUIDocument;
-                Document doc = uidoc.Document;
-
-                using (Transaction tr = new Transaction(doc, "Command"))
-                {
-                    tr.Start();
-
-                    List<SpatialElement> spaces = new FilteredElementCollector(doc).OfClass(typeof(SpatialElement)).Cast<SpatialElement>().Where(w => w is Space).ToList();
-                    double celkovyObjem = 0;
-
-                    foreach (Space space in spaces)
-                        celkovyObjem += space.get_Parameter(BuiltInParameter.ROOM_VOLUME).AsDouble() * (Math.Pow((304.8 / 1000), 3.0));
-
-
-                    System.Windows.Forms.MessageBox.Show(celkovyObjem.ToString());
-
-                    tr.Commit();
-                }
-                return Result.Succeeded;
-            }
-
-        }
-
-
+        
         /// <summary>
         /// Nod zjistí parametry objektů a zapíše je přehledně do řádků podle vstupních elementů. Výstupní informace lze nadále použít např. pro export / import do csv nebo xls souborů.
         /// </summary>

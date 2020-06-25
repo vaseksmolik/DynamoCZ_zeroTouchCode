@@ -34,10 +34,11 @@
     <DocumentationFile>bin\Release\DynamoCZ.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>KeyVasekSmolik.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CoreNodeModels">
@@ -134,14 +135,13 @@
     <Compile Include="MEP\Analyza.cs" />
     <Compile Include="MEP\GetOutermostWalls.cs" />
     <Compile Include="MEP\OrganizeDataForExport.cs" />
-    <Compile Include="SampleFunctions.cs" />
+    <Compile Include="MEP\Views.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TZObalkouBudovy\TepelneZtratyObalkovouMetodou.cs" />
     <Compile Include="_utils\AsWhatever.cs" />
     <Compile Include="_utils\TryTransaction.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="KeyVasekSmolik.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
