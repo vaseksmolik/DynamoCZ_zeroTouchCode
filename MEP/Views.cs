@@ -14,6 +14,7 @@ using Revit.GeometryConversion;
 using Line = Autodesk.Revit.DB.Line;
 using Curve = Autodesk.Revit.DB.Curve;
 using Revit.Elements.Views;
+using System.Windows.Forms;
 
 namespace DynamoCZ.MEP
 {
@@ -22,31 +23,108 @@ namespace DynamoCZ.MEP
         /// <summary>
         /// Vytvoří řezy z vybraných křivek.
         /// </summary>
-        public static void VytvorRozvinutyRez(List<Autodesk.DesignScript.Geometry.Line> lines, Revit.Elements.PlanView view)
+        public static void VytvorRozvinutyRez(
+            List<Autodesk.DesignScript.Geometry.Line> lines,
+            string nazevRezu = "RozvinutyRez",
+            double hloubkaRezu = 2,
+            double odsazeniDolu = 0,
+            double odsazeniNahoru = 20)
         {
             Document doc = DocumentManager.Instance.CurrentDBDocument;
-            ViewFamilyType vft = new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>().ToList().First();
+            ViewFamilyType vft = new FilteredElementCollector(doc).OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>().ToList().First(f => f.ViewFamily == ViewFamily.Section);
 
-            TransactionManager.Instance.EnsureInTransaction(doc);
+            //TransactionManager.Instance.EnsureInTransaction(doc);
 
-            foreach (Autodesk.DesignScript.Geometry.Line line in lines)
+            var rvtLines = lines.Select(s => s.ToRevitType());
+
+            ViewSheet viewSheet = new FilteredElementCollector(doc).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList().FirstOrDefault(f => f.Name == nazevRezu);
+
+
+            List<ViewSection> listViews = new List<ViewSection>();
+
+
+            using (TransactionGroup transGroup = new TransactionGroup(doc))
             {
-                Curve rvtCurve = line.ToRevitType();
+                transGroup.Start("TransGroup");
+                using (Transaction tr = new Transaction(doc, "Command"))
+                {
+                    tr.Start();
 
-                Transform t = Transform.Identity;
-                t.Origin = rvtCurve.Evaluate(0.5, true);
-                t.BasisX = (rvtCurve as Line).Direction;
-                t.BasisY = XYZ.BasisZ;
-                t.BasisZ = t.BasisY.CrossProduct(t.BasisY);
+                    if (viewSheet == null)
+                    {
+                        viewSheet = ViewSheet.Create(doc, ElementId.InvalidElementId);
+                        viewSheet.Name = nazevRezu;
+                    }
 
-                BoundingBoxXYZ bbx = new BoundingBoxXYZ();
-                bbx.Transform = t;
-                bbx.Min = new XYZ(-100, -100, -100);
-                bbx.Max = new XYZ(100, 100, 100);
-                ViewSection.CreateSection(doc, vft.Id, bbx);
+                    tr.Commit();
+                }
+
+                XYZ posledniUmisteni = XYZ.Zero;
+                XYZ posledniBodLine = rvtLines.First().GetEndPoint(0);
+
+                foreach (Line line in rvtLines)
+                {
+                    Curve rvtCurve = line as Curve;
+                    Viewport viewport;
+                    ViewSection viewSection;
+
+                    using (Transaction tr = new Transaction(doc, "Command"))
+                    {
+                        tr.Start();
+                        //Curve rvtCurve = line.ToRevitType();
+
+                        Transform t = Transform.Identity;
+                        t.Origin = rvtCurve.Evaluate(0.5, true);
+                        t.BasisX = (rvtCurve as Line).Direction.Negate();
+                        t.BasisY = XYZ.BasisZ;
+                        t.BasisZ = t.BasisX.CrossProduct(t.BasisY);
+
+                        BoundingBoxXYZ bbx = new BoundingBoxXYZ();
+                        bbx.Transform = t;
+                        bbx.Min = new XYZ(-(rvtCurve.Length / 2), odsazeniDolu, 0);
+                        bbx.Max = new XYZ(rvtCurve.Length / 2, odsazeniNahoru, hloubkaRezu);
+                        viewSection = ViewSection.CreateSection(doc, vft.Id, bbx);
+
+                        if (Viewport.CanAddViewToSheet(doc, viewSheet.Id, viewSection.Id))
+                        {
+                            viewport = Viewport.Create(doc, viewSheet.Id, viewSection.Id, XYZ.Zero);
+                        }
+                        else
+                            throw new Exception("Nepodařilo se umístit výřezy do výkresu.");
+
+                        tr.Commit();
+                    }
+
+                    using (Transaction tr = new Transaction(doc, "Command"))
+                    {
+                        tr.Start();
+
+                        // posuň do nuly
+                        XYZ zeroPosition = viewport.GetBoxCenter().Negate();
+                        ElementTransformUtils.MoveElement(doc, viewport.Id, zeroPosition);
+
+                        double sirka = rvtCurve.Length / viewSection.Scale;
+                        posledniUmisteni += new XYZ(sirka / 2, 0, 0);
+                        ElementTransformUtils.MoveElement(doc, viewport.Id, posledniUmisteni);
+
+                        posledniUmisteni += new XYZ(sirka / 2, 0, 0);
+
+                        posledniUmisteni += new XYZ(rvtCurve.GetEndPoint(0).DistanceTo(posledniBodLine) / viewSection.Scale, 0, 0);
+                        posledniBodLine = rvtCurve.GetEndPoint(1);
+                        tr.Commit();
+                    }
+                }
+
+
+
+
+
+                transGroup.Assimilate();
+
 
             }
-            TransactionManager.Instance.TransactionTaskDone();
+
+            //TransactionManager.Instance.TransactionTaskDone();
         }
 
         [Transaction(TransactionMode.Manual)]
@@ -64,37 +142,96 @@ namespace DynamoCZ.MEP
 
                 List<Reference> listRefs = uidoc.Selection.PickObjects(Autodesk.Revit.UI.Selection.ObjectType.Element).ToList();
                 var lines = listRefs.Select(s => ((doc.GetElement(s.ElementId) as Wall).Location as LocationCurve).Curve as Line).ToList();
+                double odsazeniNahoru = 20;
+                double odsazeniDolu = 0;
+                double hloubkaRezu = 2;
+                string nazevRezu = "RozvinutyRez";
+
+                ViewSheet viewSheet = new FilteredElementCollector(doc).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().ToList().FirstOrDefault(f => f.Name == nazevRezu);
 
 
                 List<ViewSection> listViews = new List<ViewSection>();
-                using (Transaction tr = new Transaction(doc, "Command"))
+
+
+                using (TransactionGroup transGroup = new TransactionGroup(doc))
                 {
-                    tr.Start();
-                    ViewSheet viewSheet = ViewSheet.Create(doc, ElementId.InvalidElementId);
-                    double endOfLastViewport = 0;
+                    transGroup.Start("TransGroup");
+                    using (Transaction tr = new Transaction(doc, "Command"))
+                    {
+                        tr.Start();
+
+                        if (viewSheet == null)
+                        {
+                            viewSheet = ViewSheet.Create(doc, ElementId.InvalidElementId);
+                            viewSheet.Name = nazevRezu;
+                        }
+
+                        tr.Commit();
+                    }
+
+                    XYZ posledniUmisteni = XYZ.Zero;
+                    XYZ posledniBodLine = lines.First().GetEndPoint(0);
+
                     foreach (Line line in lines)
                     {
-                        //Curve rvtCurve = line.ToRevitType();
                         Curve rvtCurve = line as Curve;
+                        Viewport viewport;
+                        ViewSection viewSection;
 
-                        Transform t = Transform.Identity;
-                        t.Origin = rvtCurve.Evaluate(0.5, true);
-                        t.BasisX = (rvtCurve as Line).Direction;
-                        t.BasisY = XYZ.BasisZ;
-                        t.BasisZ = t.BasisX.CrossProduct(t.BasisY);
+                        using (Transaction tr = new Transaction(doc, "Command"))
+                        {
+                            tr.Start();
+                            //Curve rvtCurve = line.ToRevitType();
 
-                        BoundingBoxXYZ bbx = new BoundingBoxXYZ();
-                        bbx.Transform = t;
-                        bbx.Min = new XYZ(-t.Origin.DistanceTo(rvtCurve.GetEndPoint(0)), -100, 0);
-                        bbx.Max = new XYZ(t.Origin.DistanceTo(rvtCurve.GetEndPoint(1)), 100, 100);
-                        ViewSection viewSection = ViewSection.CreateSection(doc, vft.Id, bbx);
+                            Transform t = Transform.Identity;
+                            t.Origin = rvtCurve.Evaluate(0.5, true);
+                            t.BasisX = (rvtCurve as Line).Direction.Negate();
+                            t.BasisY = XYZ.BasisZ;
+                            t.BasisZ = t.BasisX.CrossProduct(t.BasisY);
 
-                        Viewport.Create(doc, viewSheet.Id, viewSection.Id, new XYZ(endOfLastViewport, 0, 0));
-                        endOfLastViewport += rvtCurve.Length / 100;
+                            BoundingBoxXYZ bbx = new BoundingBoxXYZ();
+                            bbx.Transform = t;
+                            bbx.Min = new XYZ(-(rvtCurve.Length / 2), odsazeniDolu, 0);
+                            bbx.Max = new XYZ(rvtCurve.Length / 2, odsazeniNahoru, hloubkaRezu);
+                            viewSection = ViewSection.CreateSection(doc, vft.Id, bbx);
+
+                            if (Viewport.CanAddViewToSheet(doc, viewSheet.Id, viewSection.Id))
+                            {
+                                viewport = Viewport.Create(doc, viewSheet.Id, viewSection.Id, XYZ.Zero);
+                            }
+                            else
+                                throw new Exception("Nepodařilo se umístit výřezy do výkresu.");
+
+                            tr.Commit();
+                        }
+
+                        using (Transaction tr = new Transaction(doc, "Command"))
+                        {
+                            tr.Start();
+
+                            // posuň do nuly
+                            XYZ zeroPosition = viewport.GetBoxCenter().Negate();
+                            ElementTransformUtils.MoveElement(doc, viewport.Id, zeroPosition);
+
+                            double sirka = rvtCurve.Length / viewSection.Scale;
+                            posledniUmisteni += new XYZ(sirka / 2, 0, 0);
+                            ElementTransformUtils.MoveElement(doc, viewport.Id, posledniUmisteni);
+
+                            posledniUmisteni += new XYZ(sirka / 2, 0, 0);
+
+                            posledniUmisteni += new XYZ(rvtCurve.GetEndPoint(0).DistanceTo(posledniBodLine) / viewSection.Scale, 0, 0);
+                            posledniBodLine = rvtCurve.GetEndPoint(1);
+                            tr.Commit();
+                        }
                     }
 
 
-                    tr.Commit();
+
+
+
+                    transGroup.Assimilate();
+
+
                 }
                 return Result.Succeeded;
             }
