@@ -134,6 +134,7 @@
   <ItemGroup>
     <Compile Include="MEP\Analyza.cs" />
     <Compile Include="MEP\GetOutermostWalls.cs" />
+    <Compile Include="MEP\Izolace.cs" />
     <Compile Include="MEP\OrganizeDataForExport.cs" />
     <Compile Include="MEP\Views.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
