@@ -17,12 +17,38 @@ using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.Attributes;
 using System.Windows;
 using Level = Autodesk.Revit.DB.Level;
+using System.Data;
 
 namespace DynamoCZ
 {
     public class Analyza
     {
         private Analyza() { }
+
+        /// <summary>
+        /// Vybere více elementů z dokumentu
+        /// </summary>
+        /// <returns>List vybraných elementů</returns>
+        [IsVisibleInDynamoLibrary(true)]
+        public static List<Element> vyberElementy()
+        {
+            Document doc = DocumentManager.Instance.CurrentDBDocument;
+            UIDocument uidoc = new UIDocument(doc);
+            List<Element> returnList = new List<Element>();
+            while (true)
+            {
+                try
+                {
+                    ElementId idVybranehoPrvku = uidoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element).ElementId;
+                    returnList.Add(doc.GetElement(idVybranehoPrvku).ToDSType(true));
+                }
+                catch
+                {
+                    break;
+                }
+            }
+            return returnList;
+        }
 
         /// <summary>
         /// Detekuje obvodové stěny objektu hraničící s exteriérem. Tento nod využívá metodu "vytvoření místnosti kolem objektu", kde jsou detekovány ohraničující konstrukce. Následně je místnost opět smazána.
@@ -94,7 +120,7 @@ namespace DynamoCZ
             return celkovyObjem;
         }
 
-        
+
         /// <summary>
         /// Nod zjistí parametry objektů a zapíše je přehledně do řádků podle vstupních elementů. Výstupní informace lze nadále použít např. pro export / import do csv nebo xls souborů.
         /// </summary>
